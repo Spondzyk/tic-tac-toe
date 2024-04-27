@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import "./App.css";
 import Square from "./Square/Square";
-import { io } from "socket.io-client";
+import {io} from "socket.io-client";
 import Swal from "sweetalert2";
 
 const renderFrom = [
@@ -75,7 +75,7 @@ const App = () => {
   }, [gameState]);
 
   const takePlayerName = async () => {
-    const result = await Swal.fire({
+    return await Swal.fire({
       title: "Enter your name",
       input: "text",
       showCancelButton: true,
@@ -85,8 +85,6 @@ const App = () => {
         }
       },
     });
-
-    return result;
   };
 
   socket?.on("opponentLeftMatch", () => {
@@ -128,7 +126,8 @@ const App = () => {
     const username = result.value;
     setPlayerName(username);
 
-    const newSocket = io("http://localhost:3000", {
+    const prodBackendUrl = "http://localhost:3000"
+    const newSocket = io(prodBackendUrl, {
       autoConnect: true,
     });
 
@@ -202,8 +201,7 @@ const App = () => {
           finishedState !== "opponentLeftMatch" &&
           finishedState !== "draw" && (
             <h3 className="finished-state">
-              {finishedState === playingAs ? "You " : finishedState} won the
-              game
+              {finishedState === playingAs ? "You " : finishedState} won the game
             </h3>
           )}
         {finishedState &&
