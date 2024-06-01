@@ -16,4 +16,5 @@ COPY . .
 # convention and a good practice that declares on which port the application “should” run and not must run
 EXPOSE 8080
 
+# Define the command to run the app
 CMD [ "npm", "run", "dev" ]

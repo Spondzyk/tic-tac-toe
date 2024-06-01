@@ -5,14 +5,19 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
     base: "/",
     plugins: [react()],
+    define: {
+        global: {},
+    },
     preview: {
         port: 8080,
         strictPort: true,
     },
     server: {
-        port: 8080,
-        strictPort: true,
+        watch: {
+            usePolling: true,
+        },
         host: true,
-        origin: "http://0.0.0.0:8080",
+        strictPort: true,
+        port: 8080,
     },
 });

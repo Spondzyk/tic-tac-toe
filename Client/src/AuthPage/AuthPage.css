@@ -1,0 +1,96 @@
+.Login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #4b495f;
+}
+
+.auth-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form-container h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.login-form,
+.register-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+.login-form label,
+.register-form label {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #555;
+    align-self: flex-start;
+}
+
+.login-form input,
+.register-form input {
+    width: 100%;
+    max-width: 300px;
+    height: 40px;
+    margin-bottom: 15px;
+    padding: 0 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+.login-form input:focus,
+.register-form input:focus {
+    border-color: #e4ca56;
+    outline: none;
+}
+
+.login-form button,
+.register-form button {
+    width: 100%;
+    max-width: 200px;
+    height: 45px;
+    font-size: 18px;
+    background-color: #e4ca56;
+    color: #4b495f;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.login-form button:hover,
+.register-form button:hover {
+    background-color: #d0b042;
+}
+
+.link-btn {
+    font-size: 16px;
+    cursor: pointer;
+    color: #4b495f;
+    margin-top: 20px;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.link-btn:hover {
+    color: #434256;
+    text-decoration: underline;
+}
