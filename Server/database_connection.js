@@ -1,58 +1,58 @@
-const { v4: uuidv4 } = require('uuid');
-const AWS = require('aws-sdk');
+const mysql = require('mysql');
 
-AWS.config.update({
-    region: 'us-east-1',
-    accessKeyId: 'YOUR_ACCESS_KEY_ID',
-    secretAccessKey: 'YOUR_SECRET_ACCESS_KEY'
-});
-
-const dynamoDB = new AWS.DynamoDB();
-const docClient = new AWS.DynamoDB.DocumentClient();
-
-const createTableParams = {
-    TableName: 'GameResults',
-    AttributeDefinitions: [
-        { AttributeName: 'GameID', AttributeType: 'N' }
-    ],
-
-    KeySchema: [
-        { AttributeName: 'GameID', KeyType: 'HASH' }
-    ],
-    ProvisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1
-    }
+// MySQL connection configuration
+const connectionConfig = {
+    host: 'tic-tac-toe.c5nh2lwhprzv.us-east-1.rds.amazonaws.com',
+    user: 'root',
+    database: 'tic-tac-toe',
+    password: 'Mikolaj123',
+    port: 3306,
 };
 
-dynamoDB.createTable(createTableParams, (err, data) => {
-    if (err) {
-        console.error('Error creating table:', err);
-    } else {
+const createTableQuery = `
+                CREATE TABLE IF NOT EXISTS GameResults (
+                    GameID INT AUTO_INCREMENT PRIMARY KEY,
+                    Player1 VARCHAR(255),
+                    Player2 VARCHAR(255),
+                    Winner VARCHAR(255)
+                );
+            `;
+
+const insertQuery = `
+            INSERT INTO GameResults (Player1, Player2, Winner)
+            VALUES (?, ?, ?)
+        `;
+
+const handleDatabaseOperation = async (player1, player2, winner) => {
+    let connection;
+    try {
+        console.log('Attempting to connect to the database...');
+        connection = await mysql.createConnection(connectionConfig);
+        console.log('Connected to the database successfully');
+
+        // Create the table if it doesn't exist
+        await connection.query(createTableQuery);
         console.log('Table created successfully');
-    }
-});
 
-const saveGameResult = (player1, player2, winner) => {
-    const params = {
-        TableName: 'GameResults',
-        Item: {
-            'GameID': uuidv4(undefined, undefined, undefined),
-            'Player1': player1,
-            'Player2': player2,
-            'Winner': winner
-        }
-    };
-
-    docClient.put(params, (err, data) => {
-        if (err) {
-            console.error('Error saving game result:', err);
-        } else {
+        // Save the game result
+        const values = [player1, player2, winner];
+        connection.query(insertQuery, values, (err, results) => {
+            if (err) {
+                console.error('Error saving game result:', err.stack);
+                return;
+            }
             console.log('Game result saved successfully');
+        });
+    } catch (error) {
+        console.error('Error during database operation:', error);
+    } finally {
+        if (connection) {
+            await connection.end();
+            console.log('Database connection closed');
         }
-    });
+    }
 };
 
 module.exports = {
-    saveGameResult
+    handleDatabaseOperation
 };

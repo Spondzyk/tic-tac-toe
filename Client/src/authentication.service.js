@@ -1,11 +1,15 @@
-import { AuthenticationDetails, CognitoUser, CognitoRefreshToken } from 'amazon-cognito-identity-js';
-import userpool from './aws-exports.js';
+import {AuthenticationDetails, CognitoUser, CognitoRefreshToken, CognitoUserPool} from 'amazon-cognito-identity-js';
+
+const userPool = new CognitoUserPool({
+    UserPoolId: "us-east-1_CYb1TNMq6",
+    ClientId: "5vb4uuqccg8d8e6hb6nich39ec",
+})
 
 export const authenticate=(Username,Password)=>{
     return new Promise((resolve,reject)=>{
         const user= new CognitoUser({
             Username:Username,
-            Pool:userpool
+            Pool: userPool
         });
 
         const authDetails= new AuthenticationDetails({
@@ -27,16 +31,16 @@ export const authenticate=(Username,Password)=>{
 };
 
 export const logout = () => {
-    userpool.getCurrentUser().signOut();
+    userPool.getCurrentUser().signOut();
     window.location.href = '/';
 };
 
 export const getNick = () => {
-    return userpool.getCurrentUser().getUsername();
+    return userPool.getCurrentUser().getUsername();
 }
 
 export const refreshSession = () => {
-    const cognitoUser = userpool.getCurrentUser();
+    const cognitoUser = userPool.getCurrentUser();
 
     const refreshToken = new CognitoRefreshToken({ RefreshToken: localStorage.getItem('refresh')})
 
@@ -47,7 +51,6 @@ export const refreshSession = () => {
         }
         else {
             if (!session.isValid()) {
-                /* Session Refresh */
                 cognitoUser.refreshSession(refreshToken, (err, session) => {
                     if (err) {
                         console.log('In the err' + err);

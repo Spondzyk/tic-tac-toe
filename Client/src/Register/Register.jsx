@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { CognitoUserAttribute } from 'amazon-cognito-identity-js';
-import userpool from '../aws-exports.js';
+import {CognitoUserAttribute, CognitoUserPool} from 'amazon-cognito-identity-js';
 import './Register.css';
+
+const userPool = new CognitoUserPool({
+    UserPoolId: "us-east-1_CYb1TNMq6",
+    ClientId: "5vb4uuqccg8d8e6hb6nich39ec",
+})
 
 export const Register = ({ onFormSwitch }) => {
     const [email, setEmail] = useState('');
@@ -17,7 +21,7 @@ export const Register = ({ onFormSwitch }) => {
                 Value: email,
             }),
         );
-        userpool.signUp(username, password, attributeList, null, (err, data) => {
+        userPool.signUp(username, password, attributeList, null, (err, data) => {
             if (err) {
                 console.log(err);
                 alert("Couldn't sign up");
