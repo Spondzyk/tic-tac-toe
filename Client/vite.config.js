@@ -18,6 +18,11 @@ export default defineConfig({
         },
         host: true,
         strictPort: true,
-        port: 8080,
+        port: 3000,
     },
+    resolve: {
+        alias: {
+            './runtimeConfig': './runtimeConfig.browser',
+        },
+    }
 });

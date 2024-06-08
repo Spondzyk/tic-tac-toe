@@ -10,14 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-login-page/page8": "^1.0.4",
     "amazon-cognito-identity-js": "^6.3.12",
     "aws-amplify": "^6.3.4",
     "axios": "^1.6.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "socket.io-client": "^4.7.3",
-    "sweetalert2": "^11.6.13"
+    "socket.io-client": "^4.7.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

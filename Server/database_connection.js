@@ -10,46 +10,68 @@ const connectionConfig = {
 };
 
 const createTableQuery = `
-                CREATE TABLE IF NOT EXISTS GameResults (
-                    GameID INT AUTO_INCREMENT PRIMARY KEY,
-                    Player1 VARCHAR(255),
-                    Player2 VARCHAR(255),
-                    Winner VARCHAR(255)
-                );
-            `;
+    CREATE TABLE IF NOT EXISTS GameResults (
+                                               GameID INT AUTO_INCREMENT PRIMARY KEY,
+                                               Player1 VARCHAR(255),
+                                               Player2 VARCHAR(255),
+                                               Winner VARCHAR(255)
+    );
+`;
 
 const insertQuery = `
-            INSERT INTO GameResults (Player1, Player2, Winner)
-            VALUES (?, ?, ?)
-        `;
+    INSERT INTO GameResults (Player1, Player2, Winner)
+    VALUES (?, ?, ?)
+`;
+
+const checkTableExistsQuery = `
+    SELECT COUNT(*)
+    FROM information_schema.tables
+    WHERE table_schema = 'tic-tac-toe'
+      AND table_name = 'GameResults';
+`;
+
+const query = (connection, sql, values = []) => {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, values, (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
 
 const handleDatabaseOperation = async (player1, player2, winner) => {
-    let connection;
+    const connection = mysql.createConnection(connectionConfig);
+
     try {
         console.log('Attempting to connect to the database...');
-        connection = await mysql.createConnection(connectionConfig);
+        await query(connection, 'SELECT 1'); // Test connection
         console.log('Connected to the database successfully');
 
-        // Create the table if it doesn't exist
-        await connection.query(createTableQuery);
-        console.log('Table created successfully');
+        // Check if the table exists
+        const results = await query(connection, checkTableExistsQuery);
+        const tableExists = results[0].count > 0;
+
+        if (!tableExists) {
+            console.log('Table does not exist. Creating table...');
+            await query(connection, createTableQuery);
+            console.log('Table created successfully');
+        } else {
+            console.log('Table already exists. Skipping creation.');
+        }
 
         // Save the game result
         const values = [player1, player2, winner];
-        connection.query(insertQuery, values, (err, results) => {
-            if (err) {
-                console.error('Error saving game result:', err.stack);
-                return;
-            }
-            console.log('Game result saved successfully');
-        });
+        await query(connection, insertQuery, values);
+        console.log('Game result saved successfully');
+
     } catch (error) {
         console.error('Error during database operation:', error);
     } finally {
-        if (connection) {
-            await connection.end();
-            console.log('Database connection closed');
-        }
+        connection.end();
+        console.log('Database connection closed');
     }
 };
 

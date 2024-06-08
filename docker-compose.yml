@@ -5,15 +5,16 @@ services:
     build:
       context: ./Client
       dockerfile: Dockerfile
+    image: spondzyk/tic-tac-toe-app-client:latest
     ports:
       - "8080:8080"
+
   server:
     build:
       context: ./Server
       dockerfile: Dockerfile
+    image: spondzyk/tic-tac-toe-app-server:latest
     environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+      FRONTEND_URL: cb-load-balancer-71054534.us-east-1.elb.amazonaws.com
     ports:
       - "3000:3000"
