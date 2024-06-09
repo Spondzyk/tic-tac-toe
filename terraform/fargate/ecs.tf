@@ -1,7 +1,7 @@
 # ecs.tf
 
 resource "aws_ecs_cluster" "main" {
-  name = "cluster"
+  name = "cb-cluster"
 }
 
 data "template_file" "cb_app" {
@@ -10,9 +10,12 @@ data "template_file" "cb_app" {
   vars = {
     fargate_cpu    = var.fargate_cpu
     fargate_memory = var.fargate_memory
-    aws_region     = var.aws_region
-    app_cpu        = var.fargate_cpu
-    app_memory     = var.fargate_memory
+
+    aws_region = var.aws_region
+
+    app_cpu    = var.fargate_cpu
+    app_memory = var.fargate_memory
+
     backend_image  = var.container_image_backend
     backend_port   = var.container_port_backend
     frontend_image = var.container_image_frontend
@@ -21,19 +24,27 @@ data "template_file" "cb_app" {
 }
 
 resource "aws_ecs_task_definition" "frontend" {
-  family                   = "frontend-task"
-  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
-  network_mode             = "awsvpc"
+  family             = "cb-frontend-task"
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  network_mode       = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.fargate_cpu
-  memory                   = var.fargate_memory
-  container_definitions    = jsonencode([
+  cpu                = var.fargate_cpu
+  memory             = var.fargate_memory
+  container_definitions = jsonencode([
     {
-      name         = "frontend-app"
-      image        = var.container_image_frontend
-      cpu          = var.fargate_cpu
-      memory       = var.fargate_memory
-      essential    = true
+      name      = "frontend-app"
+      image     = var.container_image_frontend
+      cpu       = var.fargate_cpu
+      memory    = var.fargate_memory
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "/ecs/frontend"
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs-frontend"
+        }
+      }
       portMappings = [
         {
           containerPort = var.container_port_frontend
@@ -46,19 +57,27 @@ resource "aws_ecs_task_definition" "frontend" {
 }
 
 resource "aws_ecs_task_definition" "backend" {
-  family                   = "backend-task"
-  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
-  network_mode             = "awsvpc"
+  family             = "cb-backend-task"
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  network_mode       = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.fargate_cpu
-  memory                   = var.fargate_memory
-  container_definitions    = jsonencode([
+  cpu                = var.fargate_cpu
+  memory             = var.fargate_memory
+  container_definitions = jsonencode([
     {
-      name         = "backend-app"
-      image        = var.container_image_backend
-      cpu          = var.fargate_cpu
-      memory       = var.fargate_memory
-      essential    = true
+      name      = "backend-app"
+      image     = var.container_image_backend
+      cpu       = var.fargate_cpu
+      memory    = var.fargate_memory
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "/ecs/backend"
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs-backend"
+        }
+      }
       portMappings = [
         {
           containerPort = var.container_port_backend
@@ -68,7 +87,7 @@ resource "aws_ecs_task_definition" "backend" {
       ]
       environment = [
         {
-          name  = "FRONTEND_URL"
+          name  = "FRONTEND_URL",
           value = aws_alb.main.dns_name
         }
       ]
@@ -84,8 +103,8 @@ resource "aws_ecs_service" "frontend" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups  = [aws_security_group.lb.id]
-    subnets          = [aws_subnet.private[0].id] # Use the first private subnet
+    security_groups = [aws_security_group.frontend.id]
+    subnets          = aws_subnet.public.*.id
     assign_public_ip = true
   }
 
@@ -106,8 +125,8 @@ resource "aws_ecs_service" "backend" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups  = [aws_security_group.lb.id]
-    subnets          = [aws_subnet.private[0].id] # Use the first private subnet
+    security_groups = [aws_security_group.backend.id]
+    subnets          = aws_subnet.public.*.id
     assign_public_ip = true
   }
 
@@ -117,5 +136,5 @@ resource "aws_ecs_service" "backend" {
     container_port   = var.container_port_backend
   }
 
-  depends_on = [aws_alb_listener.backend]
+  depends_on = [aws_alb_listener.frontend]
 }

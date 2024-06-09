@@ -11,10 +11,10 @@ const connectionConfig = {
 
 const createTableQuery = `
     CREATE TABLE IF NOT EXISTS GameResults (
-                                               GameID INT AUTO_INCREMENT PRIMARY KEY,
-                                               Player1 VARCHAR(255),
-                                               Player2 VARCHAR(255),
-                                               Winner VARCHAR(255)
+        GameID INT AUTO_INCREMENT PRIMARY KEY,
+        Player1 VARCHAR(255),
+        Player2 VARCHAR(255),
+        Winner VARCHAR(255)
     );
 `;
 

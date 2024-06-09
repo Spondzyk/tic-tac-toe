@@ -1,25 +1,19 @@
 # alb.tf
 
 resource "aws_alb" "main" {
-  name            = "cb-load-balancer"
+  name        = "cb-load-balancer"
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.lb.id]
 }
 
 # Frontend target group
 resource "aws_alb_target_group" "frontend" {
-  name        = "cb-frontend-target-group"
+  name        = "frontend-target-group"
   port        = var.container_port_frontend
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
-
-  stickiness {
-    type            = "app_cookie"
-    enabled         = true
-    cookie_name     = "FrontendCookie"
-    cookie_duration = 600
-  }
+  deregistration_delay = "30"
 
   health_check {
     healthy_threshold   = "3"
@@ -34,18 +28,12 @@ resource "aws_alb_target_group" "frontend" {
 
 # Backend target group
 resource "aws_alb_target_group" "backend" {
-  name        = "cb-backend-target-group"
+  name        = "backend-target-group"
   port        = var.container_port_backend
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
-
-  stickiness {
-    type = "app_cookie"
-    enabled = true
-    cookie_name = "BackendCookie"
-    cookie_duration = 600
-  }
+  deregistration_delay = "30"
 
   health_check {
     healthy_threshold   = "3"

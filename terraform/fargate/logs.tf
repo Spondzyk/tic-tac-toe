@@ -1,21 +1,27 @@
-# logs.tf
-
 # Backend log group
-resource "aws_cloudwatch_log_group" "backend_log_group" {
+resource "aws_cloudwatch_log_group" "backend" {
   name              = "/ecs/backend"
   retention_in_days = 30
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = {
-    Name = "cb-backend-log-group"
+    Name = "backend-log-group"
   }
 }
 
 # Frontend log group
-resource "aws_cloudwatch_log_group" "frontend_log_group" {
+resource "aws_cloudwatch_log_group" "frontend" {
   name              = "/ecs/frontend"
   retention_in_days = 30
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = {
-    Name = "cb-frontend-log-group"
+    Name = "frontend-log-group"
   }
 }

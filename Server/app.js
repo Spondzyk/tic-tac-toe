@@ -5,7 +5,7 @@ const jwkToPem = require('jwk-to-pem');
 const jsonwebtoken = require('jsonwebtoken');
 const jsonWebKeys = require('./aws_keys');
 
-const server_address = "http://" + process.env.FRONTEND_URL + ":8080"
+const server_address = process.env.FRONTEND_URL + ":8080"
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: server_address,

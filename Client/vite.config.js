@@ -8,21 +8,12 @@ export default defineConfig({
     define: {
         global: {},
     },
-    preview: {
-        port: 8080,
-        strictPort: true,
-    },
     server: {
         watch: {
             usePolling: true,
         },
         host: true,
         strictPort: true,
-        port: 3000,
-    },
-    resolve: {
-        alias: {
-            './runtimeConfig': './runtimeConfig.browser',
-        },
+        port: 8080,
     }
 });

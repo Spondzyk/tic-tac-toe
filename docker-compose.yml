@@ -14,7 +14,5 @@ services:
       context: ./Server
       dockerfile: Dockerfile
     image: spondzyk/tic-tac-toe-app-server:latest
-    environment:
-      FRONTEND_URL: cb-load-balancer-71054534.us-east-1.elb.amazonaws.com
     ports:
       - "3000:3000"
